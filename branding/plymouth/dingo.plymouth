@@ -1,0 +1,9 @@
+# Dingo Plymouth Theme
+[Plymouth Theme]
+Name=Dingo
+Description=Dingo OS boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/dingo
+ScriptFile=/usr/share/plymouth/themes/dingo/dingo.script

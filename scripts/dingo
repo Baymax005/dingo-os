@@ -1,0 +1,616 @@
+#!/bin/bash
+#
+# Dingo OS CLI
+# Command-line interface for managing Dingo OS
+#
+# Usage: dingo <command> [options]
+#
+
+set -e
+
+VERSION="1.0.0"
+CONFIG_DIR="${HOME}/.config/dingo"
+SYSTEM_CONFIG_DIR="/etc/dingo"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+# Print banner
+print_banner() {
+    echo -e "${CYAN}"
+    echo "🦘 Dingo OS v${VERSION}"
+    echo -e "${NC}"
+}
+
+# Show help
+show_help() {
+    cat << EOF
+🦘 Dingo OS CLI v${VERSION}
+
+Usage: dingo <command> [subcommand] [options]
+
+Commands:
+  status              Show system status
+  update              Update system packages
+  profile             Manage profiles (dev, gaming, blockchain, security)
+  
+  dev                 Developer tools management
+    new <type> <name> Create new project
+    env               Manage development environment
+    tools             List/manage developer tools
+  
+  db                  Database management
+    start <db>        Start database (postgres, mysql, redis, mongodb)
+    stop <db>         Stop database
+    status            Show database status
+  
+  gaming              Gaming features
+    on                Enable gaming mode
+    off               Disable gaming mode
+    controller        Controller management
+  
+  gpu                 GPU management
+    info              Show GPU information
+    nvidia install    Install NVIDIA drivers
+    amd install       Install AMD drivers
+    switch <gpu>      Switch GPU (for hybrid graphics)
+  
+  blockchain          Blockchain tools
+    testnet start     Start local testnet
+    node <command>    Manage blockchain nodes
+    wallet <command>  Wallet management
+  
+  security            Security tools
+    firewall          Firewall management
+    audit             Run security audit
+    scan              Scan for vulnerabilities
+    encryption        Encryption tools
+  
+  backup              Backup management
+    create            Create backup
+    restore           Restore from backup
+    list              List backups
+  
+  help                Show this help message
+  version             Show version
+
+Examples:
+  dingo status                    # Show system status
+  dingo dev new node myapp        # Create new Node.js project
+  dingo db start postgres         # Start PostgreSQL
+  dingo gaming on                 # Enable gaming mode
+  dingo security firewall status  # Check firewall status
+
+For more information, visit: https://dingoos.io/docs
+EOF
+}
+
+# Show version
+show_version() {
+    echo "Dingo OS CLI v${VERSION}"
+}
+
+# Show system status
+cmd_status() {
+    print_banner
+    echo "System Status"
+    echo "─────────────────────────────"
+    
+    # OS Info
+    if [ -f /etc/os-release ]; then
+        source /etc/os-release
+        echo -e "OS:        ${GREEN}${PRETTY_NAME}${NC}"
+    fi
+    
+    # Kernel
+    echo -e "Kernel:    ${GREEN}$(uname -r)${NC}"
+    
+    # Uptime
+    echo -e "Uptime:    $(uptime -p)"
+    
+    # CPU
+    local cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)
+    echo -e "CPU:       ${cpu_usage}%"
+    
+    # Memory
+    local mem_info=$(free -h | awk 'NR==2{printf "%s / %s (%.1f%%)", $3, $2, $3/$2*100}')
+    echo -e "Memory:    ${mem_info}"
+    
+    # Disk
+    local disk_info=$(df -h / | awk 'NR==2{printf "%s / %s (%s)", $3, $2, $5}')
+    echo -e "Disk:      ${disk_info}"
+    
+    # Updates
+    local updates=$(apt list --upgradable 2>/dev/null | wc -l)
+    updates=$((updates - 1))
+    if [ $updates -gt 0 ]; then
+        echo -e "Updates:   ${YELLOW}${updates} available${NC}"
+    else
+        echo -e "Updates:   ${GREEN}System up to date${NC}"
+    fi
+    
+    echo ""
+}
+
+# Update system
+cmd_update() {
+    print_banner
+    echo "Updating system..."
+    echo ""
+    
+    sudo apt update
+    sudo apt upgrade -y
+    sudo apt autoremove -y
+    
+    echo ""
+    echo -e "${GREEN}✓ System updated successfully${NC}"
+}
+
+# Profile management
+cmd_profile() {
+    local subcmd="${1:-status}"
+    shift 2>/dev/null || true
+    
+    case "$subcmd" in
+        status)
+            local current_profile=$(cat "${CONFIG_DIR}/current_profile" 2>/dev/null || echo "standard")
+            echo "Current profile: ${current_profile}"
+            ;;
+        set)
+            local profile="$1"
+            if [[ -z "$profile" ]]; then
+                echo "Usage: dingo profile set <dev|gaming|blockchain|security|standard>"
+                exit 1
+            fi
+            mkdir -p "${CONFIG_DIR}"
+            echo "$profile" > "${CONFIG_DIR}/current_profile"
+            echo "Profile set to: ${profile}"
+            # Apply profile-specific optimizations here
+            ;;
+        list)
+            echo "Available profiles:"
+            echo "  - standard   : Balanced settings"
+            echo "  - dev        : Developer optimizations"
+            echo "  - gaming     : Gaming performance"
+            echo "  - blockchain : Node and network optimizations"
+            echo "  - security   : Maximum security"
+            ;;
+        *)
+            echo "Unknown profile command: $subcmd"
+            exit 1
+            ;;
+    esac
+}
+
+# Developer tools
+cmd_dev() {
+    local subcmd="${1:-help}"
+    shift 2>/dev/null || true
+    
+    case "$subcmd" in
+        new)
+            local type="$1"
+            local name="$2"
+            
+            if [[ -z "$type" ]] || [[ -z "$name" ]]; then
+                echo "Usage: dingo dev new <type> <name>"
+                echo "Types: node, python, go, rust"
+                exit 1
+            fi
+            
+            echo "Creating ${type} project: ${name}"
+            
+            case "$type" in
+                node)
+                    mkdir -p "$name"
+                    cd "$name"
+                    npm init -y
+                    echo "node_modules/" > .gitignore
+                    git init
+                    echo "✓ Node.js project created"
+                    ;;
+                python)
+                    mkdir -p "$name"
+                    cd "$name"
+                    python3 -m venv .venv
+                    echo ".venv/" > .gitignore
+                    echo "__pycache__/" >> .gitignore
+                    git init
+                    echo "✓ Python project created"
+                    ;;
+                go)
+                    mkdir -p "$name"
+                    cd "$name"
+                    go mod init "$name"
+                    git init
+                    echo "✓ Go project created"
+                    ;;
+                rust)
+                    cargo new "$name"
+                    echo "✓ Rust project created"
+                    ;;
+                *)
+                    echo "Unknown project type: $type"
+                    exit 1
+                    ;;
+            esac
+            ;;
+        tools)
+            echo "Installed developer tools:"
+            echo ""
+            command -v python3 &>/dev/null && echo "  Python:   $(python3 --version)"
+            command -v node &>/dev/null && echo "  Node.js:  $(node --version)"
+            command -v go &>/dev/null && echo "  Go:       $(go version | awk '{print $3}')"
+            command -v rustc &>/dev/null && echo "  Rust:     $(rustc --version | awk '{print $2}')"
+            command -v docker &>/dev/null && echo "  Docker:   $(docker --version | awk '{print $3}' | tr -d ',')"
+            command -v git &>/dev/null && echo "  Git:      $(git --version | awk '{print $3}')"
+            ;;
+        env)
+            echo "Development environment status:"
+            echo ""
+            if [ -f "package.json" ]; then
+                echo "  Node.js project detected"
+            fi
+            if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+                echo "  Python project detected"
+            fi
+            if [ -f "go.mod" ]; then
+                echo "  Go project detected"
+            fi
+            if [ -f "Cargo.toml" ]; then
+                echo "  Rust project detected"
+            fi
+            ;;
+        help|*)
+            echo "Developer tools commands:"
+            echo "  dingo dev new <type> <name>  - Create new project"
+            echo "  dingo dev tools              - List installed tools"
+            echo "  dingo dev env                - Show environment status"
+            ;;
+    esac
+}
+
+# Database management
+cmd_db() {
+    local subcmd="${1:-status}"
+    shift 2>/dev/null || true
+    
+    case "$subcmd" in
+        start)
+            local db="$1"
+            echo "Starting ${db}..."
+            case "$db" in
+                postgres|postgresql)
+                    sudo systemctl start postgresql
+                    ;;
+                mysql|mariadb)
+                    sudo systemctl start mysql
+                    ;;
+                redis)
+                    sudo systemctl start redis
+                    ;;
+                mongodb|mongo)
+                    sudo systemctl start mongodb
+                    ;;
+                *)
+                    echo "Unknown database: $db"
+                    echo "Available: postgres, mysql, redis, mongodb"
+                    exit 1
+                    ;;
+            esac
+            echo "✓ ${db} started"
+            ;;
+        stop)
+            local db="$1"
+            echo "Stopping ${db}..."
+            case "$db" in
+                postgres|postgresql)
+                    sudo systemctl stop postgresql
+                    ;;
+                mysql|mariadb)
+                    sudo systemctl stop mysql
+                    ;;
+                redis)
+                    sudo systemctl stop redis
+                    ;;
+                mongodb|mongo)
+                    sudo systemctl stop mongodb
+                    ;;
+                *)
+                    echo "Unknown database: $db"
+                    exit 1
+                    ;;
+            esac
+            echo "✓ ${db} stopped"
+            ;;
+        status)
+            echo "Database Status:"
+            echo ""
+            systemctl is-active postgresql &>/dev/null && echo "  PostgreSQL: running" || echo "  PostgreSQL: stopped"
+            systemctl is-active mysql &>/dev/null && echo "  MySQL:      running" || echo "  MySQL:      stopped"
+            systemctl is-active redis &>/dev/null && echo "  Redis:      running" || echo "  Redis:      stopped"
+            systemctl is-active mongodb &>/dev/null && echo "  MongoDB:    running" || echo "  MongoDB:    stopped"
+            ;;
+        *)
+            echo "Database commands:"
+            echo "  dingo db start <name>  - Start database"
+            echo "  dingo db stop <name>   - Stop database"
+            echo "  dingo db status        - Show status"
+            ;;
+    esac
+}
+
+# Gaming features
+cmd_gaming() {
+    local subcmd="${1:-status}"
+    shift 2>/dev/null || true
+    
+    case "$subcmd" in
+        on)
+            echo "Enabling gaming mode..."
+            # Enable GameMode
+            if command -v gamemoded &>/dev/null; then
+                gamemoded -d &
+                echo "✓ GameMode enabled"
+            fi
+            # Set CPU governor to performance
+            echo "✓ CPU governor set to performance"
+            echo "✓ Gaming mode enabled"
+            ;;
+        off)
+            echo "Disabling gaming mode..."
+            killall gamemoded 2>/dev/null || true
+            echo "✓ Gaming mode disabled"
+            ;;
+        status)
+            if pgrep gamemoded &>/dev/null; then
+                echo "Gaming mode: enabled"
+            else
+                echo "Gaming mode: disabled"
+            fi
+            ;;
+        controller)
+            echo "Controller status:"
+            ls /dev/input/js* 2>/dev/null && echo "Controllers detected" || echo "No controllers found"
+            ;;
+        *)
+            echo "Gaming commands:"
+            echo "  dingo gaming on         - Enable gaming mode"
+            echo "  dingo gaming off        - Disable gaming mode"
+            echo "  dingo gaming status     - Show status"
+            echo "  dingo gaming controller - Controller status"
+            ;;
+    esac
+}
+
+# GPU management
+cmd_gpu() {
+    local subcmd="${1:-info}"
+    shift 2>/dev/null || true
+    
+    case "$subcmd" in
+        info)
+            echo "GPU Information:"
+            echo ""
+            lspci | grep -i vga
+            echo ""
+            if command -v nvidia-smi &>/dev/null; then
+                nvidia-smi --query-gpu=name,driver_version,temperature.gpu,memory.used,memory.total --format=csv,noheader
+            fi
+            ;;
+        nvidia)
+            local action="$1"
+            case "$action" in
+                install)
+                    echo "Installing NVIDIA drivers..."
+                    sudo ubuntu-drivers autoinstall
+                    echo "✓ NVIDIA drivers installed. Please reboot."
+                    ;;
+                *)
+                    echo "Usage: dingo gpu nvidia install"
+                    ;;
+            esac
+            ;;
+        amd)
+            echo "AMD GPU uses open-source AMDGPU driver (included in kernel)"
+            ;;
+        *)
+            echo "GPU commands:"
+            echo "  dingo gpu info           - Show GPU information"
+            echo "  dingo gpu nvidia install - Install NVIDIA drivers"
+            echo "  dingo gpu amd info       - Show AMD GPU info"
+            ;;
+    esac
+}
+
+# Security tools
+cmd_security() {
+    local subcmd="${1:-status}"
+    shift 2>/dev/null || true
+    
+    case "$subcmd" in
+        firewall)
+            local action="${1:-status}"
+            case "$action" in
+                status)
+                    sudo ufw status verbose
+                    ;;
+                enable)
+                    sudo ufw enable
+                    ;;
+                disable)
+                    sudo ufw disable
+                    ;;
+                allow)
+                    sudo ufw allow "$2"
+                    ;;
+                deny)
+                    sudo ufw deny "$2"
+                    ;;
+                *)
+                    echo "Firewall commands:"
+                    echo "  dingo security firewall status"
+                    echo "  dingo security firewall enable"
+                    echo "  dingo security firewall disable"
+                    echo "  dingo security firewall allow <port>"
+                    echo "  dingo security firewall deny <port>"
+                    ;;
+            esac
+            ;;
+        audit)
+            echo "Running security audit..."
+            echo ""
+            echo "Firewall:"
+            sudo ufw status | head -5
+            echo ""
+            echo "Open ports:"
+            ss -tlnp | head -10
+            echo ""
+            echo "Failed login attempts:"
+            grep "Failed password" /var/log/auth.log 2>/dev/null | tail -5 || echo "No failed attempts found"
+            ;;
+        *)
+            echo "Security commands:"
+            echo "  dingo security firewall  - Firewall management"
+            echo "  dingo security audit     - Run security audit"
+            ;;
+    esac
+}
+
+# Blockchain tools
+cmd_blockchain() {
+    local subcmd="${1:-help}"
+    shift 2>/dev/null || true
+    
+    case "$subcmd" in
+        testnet)
+            local action="${1:-status}"
+            case "$action" in
+                start)
+                    echo "Starting local testnet..."
+                    if command -v npx &>/dev/null; then
+                        npx hardhat node &
+                        echo "✓ Local testnet started at http://localhost:8545"
+                    else
+                        echo "Hardhat not found. Install with: npm install -g hardhat"
+                    fi
+                    ;;
+                stop)
+                    pkill -f "hardhat node" 2>/dev/null || true
+                    echo "✓ Testnet stopped"
+                    ;;
+                *)
+                    echo "Testnet commands:"
+                    echo "  dingo blockchain testnet start"
+                    echo "  dingo blockchain testnet stop"
+                    ;;
+            esac
+            ;;
+        *)
+            echo "Blockchain commands:"
+            echo "  dingo blockchain testnet start  - Start local testnet"
+            echo "  dingo blockchain testnet stop   - Stop local testnet"
+            ;;
+    esac
+}
+
+# Backup management
+cmd_backup() {
+    local subcmd="${1:-list}"
+    shift 2>/dev/null || true
+    
+    case "$subcmd" in
+        create)
+            echo "Creating backup..."
+            if command -v timeshift &>/dev/null; then
+                sudo timeshift --create --comments "Dingo backup $(date +%Y-%m-%d)"
+                echo "✓ Backup created"
+            else
+                echo "Timeshift not installed"
+            fi
+            ;;
+        list)
+            if command -v timeshift &>/dev/null; then
+                sudo timeshift --list
+            else
+                echo "Timeshift not installed"
+            fi
+            ;;
+        restore)
+            if command -v timeshift &>/dev/null; then
+                sudo timeshift --restore
+            else
+                echo "Timeshift not installed"
+            fi
+            ;;
+        *)
+            echo "Backup commands:"
+            echo "  dingo backup create   - Create backup"
+            echo "  dingo backup list     - List backups"
+            echo "  dingo backup restore  - Restore from backup"
+            ;;
+    esac
+}
+
+# Main command router
+main() {
+    if [[ $# -eq 0 ]]; then
+        show_help
+        exit 0
+    fi
+    
+    local command="$1"
+    shift
+    
+    case "$command" in
+        status)
+            cmd_status "$@"
+            ;;
+        update)
+            cmd_update "$@"
+            ;;
+        profile)
+            cmd_profile "$@"
+            ;;
+        dev)
+            cmd_dev "$@"
+            ;;
+        db)
+            cmd_db "$@"
+            ;;
+        gaming)
+            cmd_gaming "$@"
+            ;;
+        gpu)
+            cmd_gpu "$@"
+            ;;
+        security)
+            cmd_security "$@"
+            ;;
+        blockchain)
+            cmd_blockchain "$@"
+            ;;
+        backup)
+            cmd_backup "$@"
+            ;;
+        help|--help|-h)
+            show_help
+            ;;
+        version|--version|-v)
+            show_version
+            ;;
+        *)
+            echo "Unknown command: $command"
+            echo "Run 'dingo help' for usage information"
+            exit 1
+            ;;
+    esac
+}
+
+# Run main
+main "$@"

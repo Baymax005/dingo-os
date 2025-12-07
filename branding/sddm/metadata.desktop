@@ -1,0 +1,10 @@
+{
+    "id": "dingo",
+    "version": "1.0",
+    "name": "Dingo",
+    "author": "Dingo OS Team",
+    "website": "https://dingoos.io",
+    "license": "GPL-3.0",
+    "themeapi": "1.0",
+    "type": "sddm-theme"
+}

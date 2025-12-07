@@ -1,0 +1,77 @@
+# Dingo OS Developer Packages
+# These packages are installed for the developer module
+
+# Languages
+python3
+python3-pip
+python3-venv
+python3-dev
+nodejs
+npm
+golang-go
+rustc
+cargo
+default-jdk
+ruby
+ruby-dev
+php
+php-cli
+
+# Version Control
+git
+git-lfs
+gh
+
+# Editors
+vim
+neovim
+
+# Build Tools
+build-essential
+cmake
+make
+automake
+autoconf
+pkg-config
+
+# Container Tools
+docker.io
+docker-compose
+podman
+
+# Database Clients
+postgresql-client
+mysql-client
+redis-tools
+mongodb-clients
+
+# Network Tools
+curl
+wget
+httpie
+netcat
+
+# Development Utilities
+jq
+yq
+ripgrep
+fd-find
+fzf
+bat
+exa
+tree
+htop
+tmux
+screen
+
+# Python Tools
+python3-pipenv
+python3-poetry
+
+# Node.js Tools (installed via npm globally)
+# - typescript
+# - ts-node
+# - nodemon
+# - pm2
+# - yarn
+# - pnpm

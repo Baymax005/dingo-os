@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dingo Control Center
+Comment=Manage your Dingo OS system
+Icon=org.dingoos.ControlCenter
+Exec=dingo-control-center
+Terminal=false
+Categories=System;Settings;
+Keywords=system;settings;configuration;dingo;
+StartupNotify=true

@@ -1,0 +1,54 @@
+/* Dingo Plymouth Boot Animation Script */
+
+// Screen dimensions
+screen_width = Window.GetWidth();
+screen_height = Window.GetHeight();
+
+// Load logo
+logo.image = Image("dingo-logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetX(screen_width / 2 - logo.image.GetWidth() / 2);
+logo.sprite.SetY(screen_height / 2 - logo.image.GetHeight() / 2 - 50);
+
+// Progress bar
+progress_bar.width = 400;
+progress_bar.height = 8;
+progress_bar.x = screen_width / 2 - progress_bar.width / 2;
+progress_bar.y = screen_height / 2 + 100;
+
+// Background for progress bar
+progress_bg.image = Image.Color(0x20, 0x20, 0x20, 0xFF);
+progress_bg.sprite = Sprite();
+progress_bg.sprite.SetImage(progress_bg.image.Scale(progress_bar.width, progress_bar.height));
+progress_bg.sprite.SetPosition(progress_bar.x, progress_bar.y, 0);
+
+// Foreground for progress bar (orange)
+progress_fg.image = Image.Color(0xE6, 0x51, 0x00, 0xFF);
+progress_fg.sprite = Sprite();
+progress_fg.sprite.SetPosition(progress_bar.x, progress_bar.y, 1);
+
+// Update progress
+fun progress_callback(duration, progress) {
+    progress_fg.sprite.SetImage(progress_fg.image.Scale(progress_bar.width * progress, progress_bar.height));
+}
+
+Plymouth.SetBootProgressFunction(progress_callback);
+
+// Message display
+message_sprite = Sprite();
+message_sprite.SetPosition(screen_width / 2, screen_height - 50, 2);
+
+fun message_callback(text) {
+    my_image = Image.Text(text, 1, 1, 1);
+    message_sprite.SetImage(my_image);
+    message_sprite.SetX(screen_width / 2 - my_image.GetWidth() / 2);
+}
+
+Plymouth.SetMessageFunction(message_callback);
+
+// Refresh function
+fun refresh_callback() {
+    // Add any animations here
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);

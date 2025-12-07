@@ -1,0 +1,66 @@
+# Dingo OS Security Packages
+# These packages are installed for the security module
+
+# Firewall
+ufw
+gufw
+
+# Intrusion Detection/Prevention
+fail2ban
+
+# Access Control
+apparmor
+apparmor-utils
+apparmor-profiles
+apparmor-profiles-extra
+
+# Encryption
+cryptsetup
+gnupg
+gnupg2
+
+# Security Scanning
+clamav
+clamav-daemon
+rkhunter
+chkrootkit
+lynis
+
+# Network Security
+nmap
+netcat-openbsd
+tcpdump
+wireshark
+
+# Password Management
+keepassxc
+
+# SSH
+openssh-client
+openssh-server
+
+# Audit Tools
+auditd
+audispd-plugins
+
+# Secure Delete
+secure-delete
+
+# Automatic Updates
+unattended-upgrades
+apt-listchanges
+
+# File Integrity
+aide
+tripwire
+
+# VPN
+wireguard
+openvpn
+
+# DNS Security
+dnscrypt-proxy
+
+# Misc Security Tools
+openssl
+ca-certificates

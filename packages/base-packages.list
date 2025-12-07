@@ -1,0 +1,88 @@
+# Dingo OS Base Packages
+# Core packages for all editions
+
+# Desktop Environment
+ubuntu-desktop-minimal
+gnome-shell
+gnome-shell-extensions
+gdm3
+gnome-terminal
+gnome-tweaks
+gnome-control-center
+nautilus
+gedit
+evince
+eog
+gnome-calculator
+gnome-system-monitor
+gnome-screenshot
+gnome-software
+
+# Extensions
+gnome-shell-extension-manager
+gnome-shell-extension-appindicator
+
+# Browsers
+firefox
+
+# Archive Tools
+p7zip-full
+unzip
+zip
+unrar
+
+# System Tools
+htop
+btop
+neofetch
+net-tools
+dnsutils
+traceroute
+whois
+
+# File Systems
+ntfs-3g
+exfat-fuse
+exfat-utils
+
+# Fonts
+fonts-firacode
+fonts-jetbrains-mono
+fonts-cascadia-code
+fonts-hack
+fonts-noto
+fonts-noto-color-emoji
+
+# Themes
+adwaita-icon-theme
+papirus-icon-theme
+
+# Media
+vlc
+gstreamer1.0-plugins-base
+gstreamer1.0-plugins-good
+gstreamer1.0-plugins-bad
+gstreamer1.0-plugins-ugly
+
+# Office (optional)
+libreoffice
+
+# Backup
+timeshift
+deja-dup
+
+# Printing
+cups
+system-config-printer
+
+# Bluetooth
+bluez
+blueman
+
+# Power Management
+tlp
+powertop
+
+# Network
+network-manager
+network-manager-gnome

@@ -1,0 +1,43 @@
+# Dingo OS Blockchain Packages
+# These packages are installed for the blockchain module
+
+# Node.js (required for many blockchain tools)
+nodejs
+npm
+
+# Python (for blockchain development)
+python3
+python3-pip
+python3-venv
+
+# Build tools (for compiling native modules)
+build-essential
+libssl-dev
+libffi-dev
+
+# Network tools
+curl
+wget
+
+# JSON processing
+jq
+
+# Ethereum tools (installed via npm)
+# - hardhat
+# - truffle
+# - ganache-cli
+
+# Rust (for some blockchain projects)
+rustc
+cargo
+
+# Foundry is installed separately via:
+# curl -L https://foundry.paradigm.xyz | bash
+
+# Geth and other nodes are installed via:
+# add-apt-repository ppa:ethereum/ethereum
+# apt install ethereum
+
+# Security tools for smart contracts
+# - slither-analyzer (pip)
+# - mythril (pip)

@@ -1,0 +1,51 @@
+# Dingo OS Gaming Packages
+# These packages are installed for the gaming module
+
+# Steam
+steam
+
+# Lutris
+lutris
+
+# Wine and Dependencies
+wine
+wine64
+winetricks
+
+# Proton Dependencies
+python3-pip
+python3-setuptools
+
+# Gaming Utilities
+gamemode
+mangohud
+goverlay
+
+# Performance Tools
+cpufrequtils
+thermald
+
+# Controller Support
+joystick
+jstest-gtk
+
+# GPU Tools
+mesa-utils
+vulkan-tools
+glmark2
+
+# NVIDIA (optional, installed via ubuntu-drivers)
+# nvidia-driver-535
+
+# AMD (included in kernel)
+# amdgpu firmware
+
+# Audio for Games
+pulseaudio
+pavucontrol
+
+# Additional Game Launchers
+# heroic-games-launcher (from external repo)
+
+# Emulators (optional)
+retroarch

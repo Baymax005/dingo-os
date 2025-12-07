@@ -1,0 +1,20 @@
+# Dingo Control Center Dependencies
+
+# GTK
+PyGObject>=3.42.0
+
+# System
+psutil>=5.9.0
+distro>=1.8.0
+
+# D-Bus
+dbus-python>=1.3.2
+
+# Async
+asyncio-glib>=0.1
+
+# Development
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
+pytest>=7.0.0

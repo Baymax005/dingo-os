@@ -1,0 +1,71 @@
+# Build artifacts
+build/
+ubuntu-build/
+arch-build/
+*.iso
+*.img
+*.squashfs
+
+# Chroot directories
+chroot/
+
+# Output directories
+output/
+iso/
+out/
+
+# Temporary files
+*.log
+*.tmp
+*.swp
+*~
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# Secrets and credentials
+*.key
+*.pem
+secrets/
+.env
+
+# Large test files
+test-*.iso
+debug-*
+
+# System files
+Thumbs.db
+Desktop.ini
+
+# Old/archived scripts (exclude from repo)
+scripts/build-arch*.sh
+scripts/setup-arch*.sh
+scripts/build-with-docker.sh
+scripts/build-ubuntu-v2.sh
+scripts/build-ubuntu-v3.sh
+scripts/build-iso.sh
+scripts/embed-control-center.sh
+scripts/regenerate-iso.sh
+scripts/test.sh
+rebuild.log
+
+# Keep these scripts in repo:
+# - build-ubuntu-v2-FIXED.sh (production build)
+# - dingo (CLI tool)
+# - dev.sh (development helper)
