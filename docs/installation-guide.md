@@ -46,15 +46,17 @@ This guide will walk you through installing Dingo OS on your computer or virtual
 
 ### Official Download
 
-1. Visit the official Dingo OS website
-2. Select your preferred edition:
-   - **Dingo OS Full** - All features (~8 GB)
-   - **Dingo OS Dev** - Developer focus (~5 GB)
-   - **Dingo OS Minimal** - Core only (~3 GB)
-3. Verify the download using SHA256 checksum
+1. Visit the [GitHub Releases](https://github.com/Baymax005/dingo-os/releases) page
+2. Download the latest ISO:
+   - **dingo-os-v2.iso** - Full edition with all features (~3.5 GB)
+3. Verify the download using SHA256 checksum (provided in release notes)
 
 ```bash
-sha256sum -c dingo-os-1.0.0.iso.sha256
+# Linux/macOS
+sha256sum dingo-os-v2.iso
+
+# Windows PowerShell
+Get-FileHash dingo-os-v2.iso -Algorithm SHA256
 ```
 
 ---
@@ -64,7 +66,7 @@ sha256sum -c dingo-os-1.0.0.iso.sha256
 ### Using Balena Etcher (Recommended)
 
 1. Download [Balena Etcher](https://www.balena.io/etcher/)
-2. Insert USB drive (8 GB minimum)
+2. Insert USB drive (4 GB minimum, 8 GB recommended)
 3. Select the Dingo OS ISO
 4. Select your USB drive
 5. Click "Flash!"
@@ -72,7 +74,7 @@ sha256sum -c dingo-os-1.0.0.iso.sha256
 ### Using dd (Linux)
 
 ```bash
-sudo dd if=dingo-os-1.0.0.iso of=/dev/sdX bs=4M status=progress
+sudo dd if=dingo-os-v2.iso of=/dev/sdX bs=4M status=progress
 sudo sync
 ```
 
@@ -154,14 +156,13 @@ This takes approximately 15-30 minutes.
 
 ## Post-Installation Setup
 
-### First Boot Wizard
+### First Login
 
-The Dingo Control Center will launch automatically to help you:
+Dingo OS boots with auto-login enabled:
+- **Username**: dingo
+- **Password**: dingo (for sudo operations)
 
-1. **Update System** - Get latest packages
-2. **Select Profile** - Choose Dev/Gaming/Security focus
-3. **Configure GPU** - Auto-detect and install drivers
-4. **Setup Tools** - Select additional tools to install
+KDE Plasma 6 desktop loads automatically.
 
 ### Recommended First Steps
 
@@ -169,11 +170,14 @@ The Dingo Control Center will launch automatically to help you:
 # Update system
 sudo apt update && sudo apt upgrade -y
 
-# Launch Dingo Control Center
-dingo-control-center
+# Launch Dingo Control Center (if installed)
+python3 /opt/dingo-center/dingo_control_center/main.py
 
-# Check system status
-dingo-status
+# Install Electrum Bitcoin wallet (requires manual install)
+sudo snap install electrum
+
+# Check system info
+neofetch
 ```
 
 ---
@@ -225,10 +229,15 @@ virt-install \
   --ram 8192 \
   --vcpus 4 \
   --disk size=80 \
-  --cdrom dingo-os-1.0.0.iso \
+  --cdrom dingo-os-v2.iso \
   --os-variant ubuntu24.04 \
   --graphics spice \
   --video virtio
+
+# Or quick test boot with QEMU
+qemu-system-x86_64 -m 4G -enable-kvm \
+  -cdrom dingo-os-v2.iso \
+  -boot d
 ```
 
 ---
@@ -257,7 +266,12 @@ virt-install \
 
 **Problem**: No network connection
 - Check if drivers are loaded: `lspci -k`
-- Install additional drivers from Dingo Control Center
+- Install additional drivers: `sudo ubuntu-drivers autoinstall`
+- Restart NetworkManager: `sudo systemctl restart NetworkManager`
+
+**Problem**: Dingo Control Center doesn't launch
+- Check if installed: `ls /opt/dingo-center/`
+- Install dependencies: `sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1 python3-psutil`
 
 ---
 
